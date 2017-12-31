@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .item1_span1,
+        .item1_span2 {
+            color: black;
+        }
+
+        .item2_span1,
+        .item2_span2 {
+            color: blue;
+        }
+
+        .item3_span1,
+        .item3_span2 {
+            color: yellow;
+        }
+    </style>
+
+    <script src="https://cdn.bootcss.com/mustache.js/2.3.0/mustache.js"></script>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script>
+        var template = '<div class="box">' +
+            '               {{#title}}' +
+            '                   <h1>{{t}}</h1>' +
+            '               {{/title}}' +
+            '               <ul>' +
+            '                   {{#items}}' +
+            '                       <li class="item">' +
+            '                           <span class="{{item_span1}}">{{content1}}</span>' +
+            '                           <span class="{{item_span2}}">{{content2}}</span>' +
+            '                       </li>' +
+            '                   {{/items}}' +
+            '               </ul>' +
+            '               {{#end1}}' +
+            '                   <p>这是结尾1</p>' +
+            '               {{/end1}}' +
+            '               {{#end2}}' +
+            '                   <p>这是结尾2</p>' +
+            '               {{/end2}}' +
+            '               {{^end3}}' +
+            '                   <p>这是结尾3</p>' +
+            '               {{/end3}}' +
+            '               {{^end4}}' +
+            '                   <p>这是结尾4</p>' +
+            '               {{/end4}}' +
+            '           </div>';
+
+        // 设置输入变量，可以根据不同值拼接不同的数据
+        var g_input1 = true;
+        // 根据某个变量输出不同的html内容
+        var get_output = function () {
+            if (g_input1) {
+                g_input1 = false;
+                return 'g_input1为true';
+            } else {
+                g_input1 = true;
+                return 'g_input1为false';
+            }
+        };
+        // 数据
+        var data = {
+            // title对应{{#title}}{{/title}}这个固定写法，名字可以随意更改，t为这个写法里面包裹的{{--}}变量,模板引擎会将数据和模板合并
+            title: {
+                t: '这是一个标题'
+            },
+            // 如果items的值写成数组格式，模板引擎可以根据添加的数据条数渲染不同的html
+            items: [{
+                    item_span1: 'item1_span1', // 可以将类名设置为数据变量，继而产生不同的页面效果
+                    item_span2: 'item1_span2',
+                    content1: '这是第一条消息1',
+                    content2: '这是第一条消息2',
+                },
+                {
+                    item_span1: 'item2_span1',
+                    item_span2: 'item2_span2',
+                    content1: '这是第二条消息1',
+                    content2: get_output, // 这里可以写函数或者表达式，根据变量灵活决定数据值
+                },
+                {
+                    item_span1: 'item3_span1',
+                    item_span2: 'item3_span2',
+                    content1: '这是第三条消息1',
+                    content2: get_output,
+                }
+            ],
+            end1: null, // {{#end1}}{{/end1}}标签中的end1为false或者null或者空字符串等情况时，end1结尾不显示
+            end2: true, // end2为true或者{a:1,b:2}等有值情况下，end2标签中间的内容显示
+            end3: null, // {{^end1}}{{/end1}}的写法与上面刚好相反，为false显示，为true显示
+            end4: true,
+        };
+        Mustache.parse(template); // 预编译模板
+        var html_str = Mustache.render(template, data); // 将模板和数据合并，返回字符串类型的html
+        document.getElementById('root').innerHTML = html_str;
+    </script>
+</body>
+
+</html>
